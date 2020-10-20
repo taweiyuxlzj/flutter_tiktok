@@ -79,14 +79,17 @@ class TikTokScaffold extends StatefulWidget {
   _TikTokScaffoldState createState() => _TikTokScaffoldState();
 }
 
+/**
+ * 这个类主要定义好每个页面切换的动画效果，对于页面需要传入 Widget
+ */
 class _TikTokScaffoldState extends State<TikTokScaffold>
     with TickerProviderStateMixin {
   AnimationController animationControllerX; //x轴 动画控制器
   AnimationController animationControllerY; //y轴 动画控制器
   Animation<double> animationX;
   Animation<double> animationY;
-  double offsetX = 0.0;
-  double offsetY = 0.0;
+  double offsetX = 0.0; //偏移量x
+  double offsetY = 0.0; //偏移量y
   // int currentIndex = 0;
   double inMiddle = 0;
 
@@ -118,14 +121,17 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
 
   @override
   Widget build(BuildContext context) {
-    screenWidth = MediaQuery.of(context).size.width;
+    //屏幕宽度
+    screenWidth = MediaQuery.of(context).size.width; //获取屏幕信息
     // 先定义正常结构
     Widget body = Stack(
       children: <Widget>[
+        //设定左边滑动效果和页面,范爷
         _LeftPageTransform(
           offsetX: offsetX,
           content: widget.leftPage,
         ),
+        //设定中间页面滑动效果和页面,抽屉滑动效果
         _MiddlePage(
           absorbing: absorbing,
           onTopDrag: () {
@@ -134,11 +140,12 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
           },
           offsetX: offsetX,
           offsetY: offsetY,
-          header: widget.header,
-          tabBar: widget.tabBar,
-          isStack: !widget.hasBottomPadding,
+          header: widget.header, //头
+          tabBar: widget.tabBar, //标签页
+          isStack: !widget.hasBottomPadding, //没有底部填充,将页面置为 Stack
           page: widget.page,
         ),
+        //右侧平移页面效果
         _RightPageTransform(
           offsetX: offsetX,
           offsetY: offsetY,
@@ -146,18 +153,25 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
         ),
       ],
     );
-    // 增加手势控制
+    // 主体页面  增加手势控制
     body = GestureDetector(
+      //垂直滑动
       onVerticalDragUpdate: calculateOffsetY,
       onVerticalDragEnd: (_) async {
+        //如果不起用手势
         if (!widget.enableGesture) return;
         absorbing = false;
+        //如果偏移y不等于0
         if (offsetY != 0) {
+          //动画置为顶部
           await animateToTop();
+          //回调调用
           widget.onPullDownRefresh?.call();
+          //设置状态
           setState(() {});
         }
       },
+      //水平滑动时
       onHorizontalDragEnd: (details) => onHorizontalDragEnd(
         details,
         screenWidth,
@@ -165,9 +179,11 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
       // 水平方向滑动开始
       onHorizontalDragStart: (_) {
         if (!widget.enableGesture) return;
+        //水平滑动开始时,x 和y停止
         animationControllerX?.stop();
         animationControllerY?.stop();
       },
+      //水平滑动过程中
       onHorizontalDragUpdate: (details) => onHorizontalDragUpdate(
         details,
         screenWidth,
@@ -230,7 +246,7 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
       return animateToPage(TikTokPagePositon.middle);
     }
     // 当滑动停止的时候 根据 offsetX 的偏移量进行动画
-    if (offsetX.abs() < screenWidth * 0.5) {
+    if (offsetX.abs() < screenWidth * 0.8) {
       // 中间页面
       return animateToPage(TikTokPagePositon.middle);
     } else if (offsetX > 0) {
@@ -290,25 +306,29 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
   /// 处于第一页且是下拉，则拦截滑动���件
   void calculateOffsetY(DragUpdateDetails details) {
     if (!widget.enableGesture) return;
+    //当处于第一页,并且是下拉,则拦截事件
     if (inMiddle != 0) {
       setState(() => absorbing = false);
       return;
     }
     final tempY = offsetY + details.delta.dy / 2;
+    //当前在第一页
     if (widget.currentIndex == 0) {
-      // absorbing = true; // TODO:暂时屏蔽了下拉刷新
+      //absorbing = true; // TODO:暂时屏蔽了下拉刷新
       if (tempY > 0) {
         if (tempY < 40) {
-          offsetY = tempY;
+          offsetY = tempY; //偏移y设定
         } else if (offsetY != 40) {
-          offsetY = 40;
+          offsetY = 40; //偏移y设定
           // vibrate();
         }
       } else {
         absorbing = false;
       }
       setState(() {});
-    } else {
+    }
+    //不在第一页面下,下拉取消。
+    else {
       absorbing = false;
       offsetY = 0;
       setState(() {});
@@ -455,13 +475,19 @@ class _LeftPageTransform extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
+    //屏幕宽度
     final screenWidth = MediaQuery.of(context).size.width;
 
+    //对子组件绘制时产生的一些特效
+    //进行放大缩小效果
+    //只针对绘制阶段,而不是布局阶段，所以无论组件做什么变化，其占用空间的大小和屏幕位置都是不变的，因为已经在布局阶段确认好了。
+    //scale 放大的倍数
     return Transform.scale(
-      scale: 0.88 + 0.12 * offsetX / screenWidth < 0.88
-          ? 0.88
-          : 0.88 + 0.12 * offsetX / screenWidth,
-      child: content ?? Placeholder(color: Colors.pink),
+      scale: 0.80 + 0.20 * offsetX / screenWidth < 0.80
+          ? 0.80
+          : 0.80 + 0.20 * offsetX / screenWidth,
+      //Placeholder 占位控件
+      child: content ?? Placeholder(color: Colors.pink, strokeWidth: 5),
     );
   }
 }
@@ -481,14 +507,16 @@ class _RightPageTransform extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width; //屏幕的宽度
+    final screenHeight = MediaQuery.of(context).size.height; //屏幕的高度
+    //右侧页面平移效果
     return Transform.translate(
-        offset: Offset(max(0, offsetX + screenWidth), 0),
+        offset: Offset(max(0, offsetX + screenWidth), 0), //偏移x+屏幕高度
         child: Container(
           width: screenWidth,
           height: screenHeight,
           color: Colors.transparent,
+          //占位控件
           child: content ?? Placeholder(fallbackWidth: screenWidth),
         ));
   }
