@@ -79,9 +79,7 @@ class TikTokScaffold extends StatefulWidget {
   _TikTokScaffoldState createState() => _TikTokScaffoldState();
 }
 
-/**
- * 这个类主要定义好每个页面切换的动画效果，对于页面需要传入 Widget
- */
+///这个类主要定义好每个页面切换的动画效果，对于页面需要传入 Widget
 class _TikTokScaffoldState extends State<TikTokScaffold>
     with TickerProviderStateMixin {
   AnimationController animationControllerX; //x轴 动画控制器
@@ -105,16 +103,16 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
     }
     switch (p) {
       case TikTokPagePositon.left:
-        await animateTo(screenWidth);
+        await animateTo(screenWidth); //当往左边滑动时候,手指从点到另一个点，相当于一个跨度动画
         break;
-      case TikTokPagePositon.middle:
+      case TikTokPagePositon.middle: //当往中间滑动时候,屏幕宽度
         await animateTo();
         break;
       case TikTokPagePositon.right:
-        await animateTo(-screenWidth);
+        await animateTo(-screenWidth); //当往右边滑动时候,屏幕宽度
         break;
     }
-    widget.controller.value = p;
+    widget.controller.value = p; //设定当前value = p
   }
 
   double screenWidth;
@@ -126,7 +124,7 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
     // 先定义正常结构
     Widget body = Stack(
       children: <Widget>[
-        //设定左边滑动效果和页面,范爷
+        //设定左边滑动效果和页面,
         _LeftPageTransform(
           offsetX: offsetX,
           content: widget.leftPage,
@@ -276,11 +274,13 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
     return animationControllerY.forward();
   }
 
+  //创建非线性动画
   CurvedAnimation curvedAnimation() {
     animationControllerX = AnimationController(
         //动画控制器
         duration: Duration(milliseconds: max(offsetX.abs(), 60) * 1000 ~/ 500),
         vsync: this);
+    //x轴 建立的一个非线性动画 curve 对应动画类型
     return CurvedAnimation(
         parent: animationControllerX, curve: Curves.easeOutCubic);
   }
@@ -314,7 +314,7 @@ class _TikTokScaffoldState extends State<TikTokScaffold>
     final tempY = offsetY + details.delta.dy / 2;
     //当前在第一页
     if (widget.currentIndex == 0) {
-      //absorbing = true; // TODO:暂时屏蔽了下拉刷新
+      //absorbing = true; // 暂时屏蔽了下拉刷新
       if (tempY > 0) {
         if (tempY < 40) {
           offsetY = tempY; //偏移y设定
@@ -352,8 +352,8 @@ class _MiddlePage extends StatelessWidget {
   final double offsetX;
   final double offsetY;
   final Function onTopDrag;
-
   final Widget header;
+  //局中页面,顶部tabbar
   final Widget tabBar;
 
   const _MiddlePage({
@@ -364,11 +364,13 @@ class _MiddlePage extends StatelessWidget {
     this.offsetY,
     this.isStack: false,
     @required this.header,
+    //必传参数
     @required this.tabBar,
     this.page,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    //如果tabbar不是null 则指定tabbar容器为一个 占位控件
     Widget tabBarContainer = tabBar ??
         Container(
           height: 44,
@@ -376,18 +378,26 @@ class _MiddlePage extends StatelessWidget {
             color: Colors.red,
           ),
         );
+
     Widget mainVideoList = Container(
       color: ColorPlate.back1,
+      //如果是 stack ,内边距为+窗体bottom高度
+      //对区域内边距进行填充
       padding: EdgeInsets.only(
         bottom: isStack ? 0 : 44 + MediaQuery.of(context).padding.bottom,
       ),
+      //设定容器页面
       child: page,
     );
     // 刷新标志
     Widget _headerContain;
+    //当移动偏移y大于20时候
     if (offsetY >= 20) {
+      //设定一个透明区域
       _headerContain = Opacity(
+        //透明度
         opacity: (offsetY - 20) / 20,
+        //平移偏移值
         child: Transform.translate(
           offset: Offset(0, offsetY),
           child: Container(
@@ -409,16 +419,17 @@ class _MiddlePage extends StatelessWidget {
         opacity: max(0, 1 - offsetY / 20),
         child: Transform.translate(
           offset: Offset(0, offsetY),
+          //解决不规则屏幕适配问题 组件
           child: SafeArea(
             child: Container(
               height: 44,
-              child: header ?? Placeholder(color: Colors.green),
+              child: header ?? Placeholder(color: Colors.red),
             ),
           ),
         ),
       );
     }
-
+    //中间视频播放和底部tab 菜单
     Widget middle = Transform.translate(
       offset: Offset(offsetX > 0 ? offsetX : offsetX / 5, 0),
       child: Stack(
@@ -432,17 +443,21 @@ class _MiddlePage extends StatelessWidget {
               ],
             ),
           ),
+          //顶部推荐本地查询等区域
           _headerContain,
         ],
       ),
     );
+    //如果page 是pageview?TODO 没看懂
     if (page is! PageView) {
       return middle;
     }
     return AbsorbPointer(
       absorbing: absorbing,
+      //超过区域滚动监视器
       child: NotificationListener<OverscrollIndicatorNotification>(
         onNotification: (notification) {
+          //阻止此次滚动
           notification.disallowGlow();
           return;
         },
