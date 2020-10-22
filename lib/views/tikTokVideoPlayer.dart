@@ -1,4 +1,3 @@
-
 import 'package:flutter_tiktok/mock/video.dart';
 import 'package:flutter/material.dart';
 import 'package:fijkplayer/fijkplayer.dart';
@@ -16,6 +15,7 @@ class VideoListController {
 
   /// 捕捉滑动，实现翻页
   void setPageContrller(PageController pageController) {
+    //pageview添加监听
     pageController.addListener(() {
       var p = pageController.page;
       if (p % 1 == 0) {
@@ -33,6 +33,7 @@ class VideoListController {
     });
   }
 
+  //bibili开源flutter 组件,从list中获取指定
   /// 获取指定index的player
   FijkPlayer playerOfIndex(int index) => playerList[index];
 
@@ -55,6 +56,7 @@ class VideoListController {
   }
 
   /// 初始化
+  /// 将用户视频信息添加到是视频列表中
   init(PageController pageController, List<UserVideo> initialList) {
     addVideoInfo(initialList);
     setPageContrller(pageController);

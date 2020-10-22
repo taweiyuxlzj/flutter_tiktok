@@ -1,4 +1,3 @@
-
 import 'package:flutter_tiktok/style/style.dart';
 import 'package:flutter_tiktok/views/selectText.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +77,7 @@ class TikTokTabBar extends StatelessWidget {
       ],
     );
     return Container(
-      color: hasBackground ? ColorPlate.back2 : ColorPlate.back2.withOpacity(0),
+      color: hasBackground ? ColorPlate.red : ColorPlate.back2.withOpacity(0),
       child: Container(
         padding: EdgeInsets.only(bottom: padding.bottom),
         height: 50 + padding.bottom,

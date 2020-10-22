@@ -33,6 +33,7 @@ class _UserPageState extends State<UserPage> {
         children: <Widget>[
           Tapped(
             child: _UserRightButton(
+              //判断是否当前自己页面,如果自己页面则为钱包,否则是关注
               title: widget.isSelfPage ? '钱包' : '关注',
             ),
           ),
@@ -40,17 +41,23 @@ class _UserPageState extends State<UserPage> {
       ),
     );
     Widget avatar = Container(
-      height: 120 + MediaQuery.of(context).padding.top,
-      padding: EdgeInsets.only(left: 18),
+      //对于顶部头部显示的区域高度
+      height: 150 + MediaQuery.of(context).padding.top,
+      //头像的内边距
+      padding: EdgeInsets.only(left: 50),
       alignment: Alignment.bottomLeft,
+      //溢出控件,允许子控件超出父控件范围显示
       child: OverflowBox(
         alignment: Alignment.bottomLeft,
         minHeight: 20,
         maxHeight: 300,
+        //设定的头像
         child: Container(
           height: 74,
           width: 74,
+          //外边距
           margin: EdgeInsets.only(bottom: 12),
+          //盒子装饰器
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(44),
             color: Colors.orange,
@@ -59,17 +66,21 @@ class _UserPageState extends State<UserPage> {
               width: 1,
             ),
           ),
+          //图片裁剪椭圆形
           child: ClipOval(
             child: Image.network(
               "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif",
+              //图片裁剪类型
               fit: BoxFit.cover,
             ),
           ),
         ),
       ),
     );
+    //列表
     Widget body = ListView(
       physics: BouncingScrollPhysics(
+        //定义物理滚动特性，上拉有回弹效果
         parent: AlwaysScrollableScrollPhysics(),
       ),
       children: <Widget>[
@@ -79,6 +90,7 @@ class _UserPageState extends State<UserPage> {
           alignment: Alignment.bottomLeft,
           children: <Widget>[likeButton, avatar],
         ),
+        //用户信息区域
         Container(
           color: ColorPlate.back1,
           child: Column(
@@ -116,9 +128,10 @@ class _UserPageState extends State<UserPage> {
               Container(
                 color: ColorPlate.back1,
                 padding: EdgeInsets.symmetric(
-                  horizontal: 8,
+                  horizontal: 10,
                   vertical: 2,
                 ),
+                //
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
